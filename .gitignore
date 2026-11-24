@@ -1,1 +1,31 @@
-data
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+*.py[cod]
+.venv/
+.env
+.DS_Store
+logs/
+# Never commit downloaded or prepared datasets, checkpoints, or raw data
+/data/*
+!/data/README.md
+/checkpoints/*
+!/checkpoints/README.md
+!/checkpoints/.gitkeep
+# CSV and figures are intended to be committed after validation.
+
+# Runtime / local-only artifacts (the publisher additionally uses an allowlist).
+*.lock
+*.tmp-*
+*.log
+*.out
+*.err
+*.zip
+*.tar.gz
+*.npy
+*.npz
+*.pt
+*.pth
+!/configs/*/*/accepted_pruned_ticket.pt
+/results/TEST_EVALUATION_FROZEN.json
+.env.*

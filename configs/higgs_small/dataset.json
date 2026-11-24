@@ -1,0 +1,152 @@
+{
+  "schema": "dpn_dataset_v2",
+  "dataset": "higgs_small",
+  "source": {
+    "type": "prepared_numpy",
+    "path": "data/higgs_small",
+    "official_source_url": "https://github.com/yandex-research/rtdl-revisiting-models",
+    "download_instructions": "Use the official prepared dataset archive described in the source README. Extract the exact prepared split into data/higgs_small. A source URL alone is not assumed to be a reproducible split."
+  },
+  "expected": {
+    "total_rows": 98050,
+    "input_features": 28,
+    "classes": 2,
+    "output_logits": 1,
+    "task_type": "binary"
+  },
+  "preprocessing": {
+    "normalization": "quantile",
+    "fit_on": "train",
+    "quantile_noise": 0.001,
+    "quantile_n_quantiles_policy": "min(max(train_rows // 30, 10), 1000)",
+    "quantile_output": "normal",
+    "subsample": 1000000000,
+    "missing_values": "train_means",
+    "categorical_features": "reject"
+  },
+  "split_policy": {
+    "train": "official",
+    "validation": "official",
+    "test": "sealed_until_explicit_final_evaluation"
+  },
+  "pruning": {
+    "entrypoint": "src.utils.apply_lth_pruning",
+    "initial_hidden_blocks": 236,
+    "initial_hidden_width": 1,
+    "output_block_width": 1,
+    "outer_initial_rounds": 50,
+    "candidate_training_epochs": 3,
+    "target_prune_fraction": 0.95,
+    "validation_selection": "accuracy",
+    "reference_target_diagnostic_only": 34893,
+    "initialization": "he_normal_uniform_bias_v1",
+    "normalization": "pre_linear_ln",
+    "dropout": 0.1
+  },
+  "reference_mlp": {
+    "hidden_widths": [
+      231,
+      121
+    ],
+    "dropout": 0.4896848511498748,
+    "initialization": "torch_linear_default",
+    "matching_tolerance": 0.01
+  },
+  "training": {
+    "optimizer": "adamw",
+    "learning_rate": 0.0007537468376056318,
+    "weight_decay": 0.0,
+    "batch_size": 512,
+    "max_epochs": 300,
+    "patience": 16,
+    "save_every_epochs": 1,
+    "early_stop_metric": "validation_accuracy",
+    "shuffle": "seed_plus_epoch"
+  },
+  "regularization": {
+    "pruned_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1
+    },
+    "matched_mlp": {
+      "normalization": "none",
+      "dropout": 0.4896848511498748
+    },
+    "matched_resnet": {
+      "normalization": "batchnorm",
+      "hidden_dropout": 0.1,
+      "residual_dropout": 0.0
+    },
+    "lth_mlp": {
+      "normalization": "none",
+      "dropout": 0.4896848511498748,
+      "pretrain_epochs_per_round": 5,
+      "cumulative_mask_targets": [
+        0.5,
+        0.9
+      ],
+      "rewind": "initial"
+    },
+    "block_matched_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1,
+      "hidden_norm_affine": false,
+      "mlp_depth_match": true,
+      "parameter_tolerance": 0.005
+    },
+    "parameter_matched_max_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1
+    },
+    "staged_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1,
+      "candidates": [
+        "staged_compressed",
+        "staged_input_skip"
+      ],
+      "validation_selected": true
+    }
+  },
+  "evaluation": {
+    "validation_metrics": [
+      "accuracy",
+      "macro_f1",
+      "balanced_accuracy",
+      "log_loss",
+      "brier",
+      "ece15",
+      "auroc"
+    ],
+    "test_is_opt_in": true,
+    "latency_batch_size": 1,
+    "latency_repeats": 50
+  },
+  "seeds": [
+    42,
+    77,
+    53,
+    31,
+    18
+  ],
+  "provenance": {
+    "regularized_main_benchmark": "Steps 84-87; corrected Block DPN from Step 89",
+    "higgs_warning": "HIGGS Small is 98,050 rows, NOT HIGGS-500k."
+  },
+  "data_acquisition": {
+    "type": "official_rtdl_archive",
+    "download_url": "https://www.dropbox.com/s/o53umyg6mn3zhxy/data.tar.gz?dl=1",
+    "archive_subdir": "data/higgs_small",
+    "sha256": "1340e63285c9ae83667ada676deae831e6a0d40893b6adddb08999f89004b7df",
+    "notes": "Project-verified SHA256 fingerprints: archive and all seven files matched the original benchmark data on Roihu (2026-11-24). Not publisher-issued checksums. No resplitting.",
+    "file_sha256": {
+      "N_test.npy": "e78b92701afe7c3124be50f330eefa0210b02f5fca0132369875faac91526f55",
+      "N_train.npy": "4f95babc0f93ddcb066c15b9d28385ed9d945a6011ee16fc7990b177b9651c48",
+      "N_val.npy": "89763fee12c2c8ed77545af781186eafdcadab29bdbb01634146055f8ed3c95a",
+      "info.json": "fe3e4eeafac4bf16e13f645eeb2c21902cfd711d4363415d837fd128a97ffff2",
+      "y_test.npy": "b11cb8e1768037d615c8d25122f86c4daf39872f1bacce8c44c45a4bd776bee0",
+      "y_train.npy": "04dfe530b0c489bf4012ca32a08b0d02a9749de90925621da268b623d6571b6a",
+      "y_val.npy": "bd7918755575bf2780d750f82bd9f39c6e325014a4ce975b846e01dab8a215cb"
+    }
+  }
+}

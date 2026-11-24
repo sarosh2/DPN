@@ -1,0 +1,153 @@
+{
+  "schema": "dpn_dataset_v2",
+  "dataset": "helena",
+  "source": {
+    "type": "prepared_numpy",
+    "path": "data/helena",
+    "official_source_url": "https://github.com/yandex-research/rtdl-revisiting-models",
+    "download_instructions": "Use the official prepared dataset archive described in the source README. Extract the exact prepared split into data/helena. A source URL alone is not assumed to be a reproducible split."
+  },
+  "expected": {
+    "total_rows": 65196,
+    "input_features": 27,
+    "classes": 100,
+    "output_logits": 100,
+    "task_type": "multiclass"
+  },
+  "preprocessing": {
+    "normalization": "standard",
+    "fit_on": "train",
+    "quantile_noise": 0.001,
+    "quantile_n_quantiles_policy": "min(max(train_rows // 30, 10), 1000)",
+    "quantile_output": "normal",
+    "subsample": 1000000000,
+    "missing_values": "train_means",
+    "categorical_features": "reject"
+  },
+  "split_policy": {
+    "train": "official",
+    "validation": "official",
+    "test": "sealed_until_explicit_final_evaluation"
+  },
+  "pruning": {
+    "entrypoint": "src.utils.apply_lth_pruning",
+    "initial_hidden_blocks": 542,
+    "initial_hidden_width": 1,
+    "output_block_width": 1,
+    "outer_initial_rounds": 50,
+    "candidate_training_epochs": 3,
+    "target_prune_fraction": 0.95,
+    "validation_selection": "accuracy",
+    "reference_target_diagnostic_only": 223246,
+    "initialization": "he_normal_uniform_bias_v1",
+    "normalization": "pre_linear_ln",
+    "dropout": 0.0
+  },
+  "reference_mlp": {
+    "hidden_widths": [
+      441,
+      209,
+      382
+    ],
+    "dropout": 0.2697044507316503,
+    "initialization": "torch_linear_default",
+    "matching_tolerance": 0.01
+  },
+  "training": {
+    "optimizer": "adamw",
+    "learning_rate": 0.0005075419386838162,
+    "weight_decay": 0.0004878545209148741,
+    "batch_size": 512,
+    "max_epochs": 300,
+    "patience": 16,
+    "save_every_epochs": 1,
+    "early_stop_metric": "validation_accuracy",
+    "shuffle": "seed_plus_epoch"
+  },
+  "regularization": {
+    "pruned_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.0
+    },
+    "matched_mlp": {
+      "normalization": "none",
+      "dropout": 0.2697044507316503
+    },
+    "matched_resnet": {
+      "normalization": "batchnorm",
+      "hidden_dropout": 0.0,
+      "residual_dropout": 0.0
+    },
+    "lth_mlp": {
+      "normalization": "none",
+      "dropout": 0.2697044507316503,
+      "pretrain_epochs_per_round": 5,
+      "cumulative_mask_targets": [
+        0.5,
+        0.9
+      ],
+      "rewind": "initial"
+    },
+    "block_matched_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.0,
+      "hidden_norm_affine": false,
+      "mlp_depth_match": true,
+      "parameter_tolerance": 0.005
+    },
+    "parameter_matched_max_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.0
+    },
+    "staged_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.0,
+      "candidates": [
+        "staged_compressed",
+        "staged_input_skip"
+      ],
+      "validation_selected": true
+    }
+  },
+  "evaluation": {
+    "validation_metrics": [
+      "accuracy",
+      "macro_f1",
+      "balanced_accuracy",
+      "log_loss",
+      "brier",
+      "ece15",
+      "auroc"
+    ],
+    "test_is_opt_in": true,
+    "latency_batch_size": 1,
+    "latency_repeats": 50
+  },
+  "seeds": [
+    42,
+    77,
+    53,
+    31,
+    18
+  ],
+  "provenance": {
+    "regularized_main_benchmark": "Steps 84-87; corrected Block DPN from Step 89",
+    "higgs_warning": "HIGGS Small is 98,050 rows, NOT HIGGS-500k."
+  },
+  "data_acquisition": {
+    "type": "official_rtdl_archive",
+    "download_url": "https://www.dropbox.com/s/o53umyg6mn3zhxy/data.tar.gz?dl=1",
+    "archive_subdir": "data/helena",
+    "sha256": "1340e63285c9ae83667ada676deae831e6a0d40893b6adddb08999f89004b7df",
+    "notes": "Project-verified SHA256 fingerprints: archive and all seven files matched the original benchmark data on Roihu (2026-11-24). Not publisher-issued checksums. No resplitting.",
+    "file_sha256": {
+      "N_test.npy": "44686793c5ee7bc55779823a4bb43709867f955bca1b1952f601529005702fb8",
+      "N_train.npy": "70122f58c9a3d981cb4e15c34a7f6aef351c7e7511dd56973c22eed0dd446abd",
+      "N_val.npy": "9e1b2ae8f051e96ada5bd3987cbbc42e44e399aadf0bd55da7a0fc30d5b9628b",
+      "info.json": "b46ac9fc2271ef1530a9c481ad2fb1bb241ecb10c29bdbf73c8aa827da3a35fc",
+      "y_test.npy": "e60c157211c56d1a46b64419f879493e442b015714ec8be3432955cbb050c6d1",
+      "y_train.npy": "538571ebb9f6ca15e7eb726186dbd0d0c5e05f7831bb3bba262569733535429f",
+      "y_val.npy": "fd5a9e2ea543ed8c733e4115ea8a7a4bc65b4d3aa3eb5ad5dce27f953a18070f"
+    }
+  }
+}

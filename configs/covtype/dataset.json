@@ -1,0 +1,157 @@
+{
+  "schema": "dpn_dataset_v2",
+  "dataset": "covtype",
+  "source": {
+    "type": "prepared_numpy",
+    "path": "data/covtype",
+    "official_source_url": "https://github.com/yandex-research/rtdl-revisiting-models",
+    "download_instructions": "Use the official prepared dataset archive described in the source README. Extract the exact prepared split into data/covtype. A source URL alone is not assumed to be a reproducible split."
+  },
+  "expected": {
+    "total_rows": 581012,
+    "input_features": 54,
+    "classes": 7,
+    "output_logits": 7,
+    "task_type": "multiclass"
+  },
+  "preprocessing": {
+    "normalization": "quantile",
+    "fit_on": "train",
+    "quantile_noise": 0.001,
+    "quantile_n_quantiles_policy": "min(max(train_rows // 30, 10), 1000)",
+    "quantile_output": "normal",
+    "subsample": 1000000000,
+    "missing_values": "train_means",
+    "categorical_features": "reject"
+  },
+  "split_policy": {
+    "train": "official",
+    "validation": "official",
+    "test": "sealed_until_explicit_final_evaluation"
+  },
+  "pruning": {
+    "entrypoint": "src.utils.apply_lth_pruning",
+    "initial_hidden_blocks": 1681,
+    "initial_hidden_width": 1,
+    "output_block_width": 1,
+    "outer_initial_rounds": 50,
+    "candidate_training_epochs": 3,
+    "target_prune_fraction": 0.95,
+    "validation_selection": "accuracy",
+    "reference_target_diagnostic_only": 1516517,
+    "initialization": "he_normal_uniform_bias_v1",
+    "normalization": "pre_linear_ln",
+    "dropout": 0.1
+  },
+  "reference_mlp": {
+    "hidden_widths": [
+      862,
+      444,
+      444,
+      444,
+      444,
+      444,
+      654
+    ],
+    "dropout": 0.08104709141522753,
+    "initialization": "torch_linear_default",
+    "matching_tolerance": 0.01
+  },
+  "training": {
+    "optimizer": "adamw",
+    "learning_rate": 6.291946534954244e-05,
+    "weight_decay": 0.0,
+    "batch_size": 1024,
+    "max_epochs": 300,
+    "patience": 16,
+    "save_every_epochs": 1,
+    "early_stop_metric": "validation_accuracy",
+    "shuffle": "seed_plus_epoch"
+  },
+  "regularization": {
+    "pruned_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1
+    },
+    "matched_mlp": {
+      "normalization": "none",
+      "dropout": 0.08104709141522753
+    },
+    "matched_resnet": {
+      "normalization": "batchnorm",
+      "hidden_dropout": 0.1,
+      "residual_dropout": 0.0
+    },
+    "lth_mlp": {
+      "normalization": "none",
+      "dropout": 0.08104709141522753,
+      "pretrain_epochs_per_round": 5,
+      "cumulative_mask_targets": [
+        0.5,
+        0.9
+      ],
+      "rewind": "initial"
+    },
+    "block_matched_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1,
+      "hidden_norm_affine": false,
+      "mlp_depth_match": true,
+      "parameter_tolerance": 0.005
+    },
+    "parameter_matched_max_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1
+    },
+    "staged_dpn": {
+      "normalization": "pre_linear_ln",
+      "dropout": 0.1,
+      "candidates": [
+        "staged_compressed",
+        "staged_input_skip"
+      ],
+      "validation_selected": true
+    }
+  },
+  "evaluation": {
+    "validation_metrics": [
+      "accuracy",
+      "macro_f1",
+      "balanced_accuracy",
+      "log_loss",
+      "brier",
+      "ece15",
+      "auroc"
+    ],
+    "test_is_opt_in": true,
+    "latency_batch_size": 1,
+    "latency_repeats": 50
+  },
+  "seeds": [
+    42,
+    77,
+    53,
+    31,
+    18
+  ],
+  "provenance": {
+    "regularized_main_benchmark": "Steps 84-87; corrected Block DPN from Step 89",
+    "higgs_warning": "HIGGS Small is 98,050 rows, NOT HIGGS-500k."
+  },
+  "data_acquisition": {
+    "type": "official_rtdl_archive",
+    "download_url": "https://www.dropbox.com/s/o53umyg6mn3zhxy/data.tar.gz?dl=1",
+    "archive_subdir": "data/covtype",
+    "sha256": "1340e63285c9ae83667ada676deae831e6a0d40893b6adddb08999f89004b7df",
+    "notes": "Project-verified SHA256 fingerprints: archive and all seven files matched the original benchmark data on Roihu (2026-11-24). Not publisher-issued checksums. No resplitting.",
+    "file_sha256": {
+      "N_test.npy": "814e36becd2c8449b723348f080bd9f20ae54550b0ab2fbeaef1aabf0b80cf0e",
+      "N_train.npy": "f6d1487f263beb0533fa9fc276585ec84cbad3bb62f40940aba220874344d1dc",
+      "N_val.npy": "4aebc11ee716b697c910f3e3cc002968de0835b7dfd1f322b5aab3c811ce64f8",
+      "info.json": "1b0f04dcaf72bee6b180c8b4197d9d1cfce5715c30213e19975b03443f40ce88",
+      "y_test.npy": "e842ea51a78064ca11237c995a201cfbd30e310dc8a7ea1850b945b5f2d3ac86",
+      "y_train.npy": "c6e1adb82e2d0989566ea2f545d0cd839e49e340e77aa58c0b4cd90115a22663",
+      "y_val.npy": "912ed739789cd057d90c18d48e3864e88721d9ddba582f6c7d7c3a718193e5d3"
+    }
+  }
+}
